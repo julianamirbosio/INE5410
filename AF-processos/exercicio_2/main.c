@@ -24,38 +24,35 @@
 // - netos devem esperar 5 segundos antes de imprmir a mensagem de finalizado (e terminar)
 // - pais devem esperar pelos seu descendentes diretos antes de terminar
 
-void ProcessoNetos(int n) { // n = 3
+void ProcessoNetos(int nNetos) { // n = 3
     pid_t pid;
-    for (int j = 0; j < n; j++) {
+    for (int j = 0; j < nNetos; j++) {
         fflush(stdout); // antes do fork
         pid = fork();
         if (pid == 0) {
-            printf("Processo %d filho de %d\n", getpid(), getppid());
+            printf("Processo %d, filho de %d\n", getpid(), getppid());
             sleep(5);
             printf("Processo %d finalizado\n", getpid());
             exit(0);
         }
     }
     
-    while(wait(NULL) >= 0);    
-
 }
 
-void ProcessoFilhos(int n, int k) { // n = 2, k = 3
+void ProcessoFilhos(int nFilhos, int nNetos) { // n = 2, k = 3
     pid_t pid;
     // criar netos
-    for (int j = 0; j < n; j++) {
+    for (int j = 0; j < nFilhos; j++) {
         fflush(stdout); // antes do fork
         pid = fork();
         if (pid == 0) {
-            printf("Processo %d filho de %d\n", getpid(), getppid());
-            ProcessoNetos(k);
+            printf("Processo %d, filho de %d\n", getpid(), getppid());
+            ProcessoNetos(nNetos);
+            while(wait(NULL) >= 0);    
             printf("Processo %d finalizado\n", getpid());
             exit(0);
         }
     }
-    
-    while(wait(NULL) >= 0);
 }
 
 int main(int argc, char** argv) {

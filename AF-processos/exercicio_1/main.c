@@ -35,13 +35,16 @@ int main(int argc, char** argv) {
         pid = fork();
         if(pid >= 0) {
             if(pid == 0) {
-                printf("Processo filho %d criado!\n", getpid());
+                printf("Processo filho %d criado\n", getpid());
                 return 0;
-            }
+            } else {
+                printf("Processo pai criou %d\n", pid);
+             }
         }
     }
 
     while(wait(NULL) >= 0);    
+
     printf("Processo pai finalizado!\n");
 
     return 0;
