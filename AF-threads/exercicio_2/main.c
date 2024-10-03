@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <pthread.h>
+#include "helper.h"
 
 // Lê o conteúdo do arquivo filename e retorna um vetor E o tamanho dele
 // Se filename for da forma "gen:%d", gera um vetor aleatório com %d elementos
@@ -20,48 +21,33 @@ double* load_vector(const char* filename, int* out_size);
 // tenham tamanho size.
 void avaliar(double* a, double* b, double* c, int size);
 
+
 struct data {
-int* a;
-int* b;
-int* c;
-int quantidade;
-int start;
-int end;
+double* a;
+double* b;
+double* c;
+
+int inicio;
+int fim;
 };
 
-void* vectorSum(void* s) {
+void* soma_vetores(void* s) {
 
     struct data* vec = (struct data*) s;
 
-    int* a = vec->a;
-    int*b = vec->b;
-    int* c = vec->c;
-    int quantidade = vec->quantidade;
-    
+    double* a = vec->a;
+    double*b = vec->b;
+    double* c = vec->c;
 
+    int inicio = vec->inicio;
+    int fim = vec->fim;
 
-    int quantidade = *(int*) arg[4];
-    
-
-/*
-
- n = 5; a_size = 8; -> 2 somas pra cada;
-
- n = 0:
-    
-    c[0] = a[0] + b[1]
-    c[1] = a[1] + b[1]
-
-n = 1:
-
-    c[2] = a[2] + b[2];
-
-*/
-
-    start = i
-    for (int i = start; i < end; ++i) {
+    for (int i = inicio; i < fim; ++i) {
         c[i] = a[i] + b[i];
+        // printf("a = %f, b = %f, c = %f\n", a[i], b[i], c[i]);
     } 
+
+    return 0;
 
 }
 
@@ -113,8 +99,9 @@ int main(int argc, char* argv[]) {
     // Calcula com uma thread só. Programador original só deixou a leitura 
     // do argumento e fugiu pro caribe. É essa computação que você precisa 
     // paralelizar
-    for (int i = 0; i < a_size; ++i) 
-        c[i] = a[i] + b[i];
+
+    // for (int i = 0; i < a_size; ++i) 
+    //     c[i] = a[i] + b[i];
 
     //////////////
 
@@ -125,31 +112,30 @@ int main(int argc, char* argv[]) {
     }
 
     pthread_t threads[n_threads];
+    struct data s;
 
     int quantidade = a_size / n_threads;
     int resto = a_size % n_threads;
 
-    // int* arg[] = {a, b, c, quantidade};
-
-    struct data s;
-    s.a = a;
-    s.b = b;
-    s.c = c;
-    s.quantidade = quantidade;
-
     for (int i = 0; i < n_threads; i++) {
-        s.start = i*quantidade;
-        s.end = (i+1) * quantidade;
+
+        s[i].a = a;
+        s[i].b = b;
+        s[i].c = c;
+        s[i].inicio = i*quantidade;
+        s[i].fim = (i+1)*quantidade;
+
         if (i == n_threads - 1) {
-            s.quantidade += resto;
+            s[i].fim += resto;
         }
-        pthread_create(&threads[i], NULL, vectorSum, (void *)&s);
+
+        pthread_create(&threads[i], NULL, soma_vetores, (void *)&s[i]);
     }
 
+    for (int i = 0; i < n_threads; ++i)
+        pthread_join(threads[i], NULL);
 
     //////////
-
-    
 
     //    +---------------------------------+
     // ** | IMPORTANTE: avalia o resultado! | **

@@ -47,11 +47,10 @@ int main(int argc, char* argv[]) {
     pthread_t threads[n_threads];
 
     // Threads trabalhadoras
-    for (int i = 0; i < n_threads; i++) {
+    for (int i = 0; i < n_threads; i++) 
         pthread_create(&threads[i], NULL, thread, (void *)&n_loops);
-    }
 
-    for (int i = 0; i < n_threads; ++i)
+    for (int i = 0; i < n_threads; i++)
         pthread_join(threads[i], NULL);
 
     //

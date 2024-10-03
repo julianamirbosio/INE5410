@@ -15,10 +15,41 @@
 // v                                       v
 double* load_vector(const char* filename, int* out_size);
 
-
 // Avalia se o prod_escalar é o produto escalar dos vetores a e b. Assume-se
 // que ambos a e b sejam vetores de tamanho size.
 void avaliar(double* a, double* b, int size, double prod_escalar);
+
+struct data {
+
+    double* a;
+    double* b;
+    double resultado;
+    int inicio;
+    int fim;
+
+};
+
+void* produto_vetorial(void* s) {
+
+    struct data* vec = (struct data*) s;
+
+        double* a = vec->a;
+        double* b = vec->b;
+
+        int inicio = vec->inicio;
+        int fim = vec->fim;
+
+        vec->resultado = 0.0;
+        printf("INICIO: %d - FIM: %d\n", inicio, fim);
+        for (int i = inicio; i < fim; i++) {
+            vec->resultado += a[i] * b[i];
+            //printf("%f\n", vec->resultado);
+        }
+         
+        return 0;
+
+}
+
 
 int main(int argc, char* argv[]) {
     srand(time(NULL));
@@ -60,9 +91,44 @@ int main(int argc, char* argv[]) {
     }
 
     //Calcula produto escalar. Paralelize essa parte
-    double result = 0;
-    for (int i = 0; i < a_size; ++i) 
-        result += a[i] * b[i];
+    double result = 0.0;
+    // for (int i = 0; i < a_size; ++i) 
+    //     result += a[i] * b[i];
+
+    if (n_threads > a_size) {
+        n_threads = a_size;
+    }
+
+    pthread_t threads[n_threads];
+
+    struct data* s = (struct data *) malloc(n_threads * sizeof(struct data)); 
+
+    int quantidade = a_size / n_threads;
+    int resto = a_size % n_threads;
+
+    for (int i = 0; i < n_threads; i++) {
+
+        s[i].a = a;
+        s[i].b = b;
+        s[i].inicio = i*quantidade;
+        s[i].fim = (i+1)*quantidade;
+
+        if (i == n_threads - 1) {
+            s[i].fim += resto;
+        }
+
+        if (s[i].fim > a_size) {
+            s[i].fim = a_size;
+        }
+
+        pthread_create(&threads[i], NULL, produto_vetorial, (void *) &s[i]);
+    }
+
+    for (int i = 0; i < n_threads; ++i) {
+        pthread_join(threads[i], NULL);
+        result += s[i].resultado;
+    }
+        
     
     //    +---------------------------------+
     // ** | IMPORTANTE: avalia o resultado! | **
@@ -70,6 +136,7 @@ int main(int argc, char* argv[]) {
     avaliar(a, b, a_size, result);
 
     //Libera memória
+    free(s);
     free(a);
     free(b);
 
