@@ -19,7 +19,7 @@ double* load_vector(const char* filename, int* out_size);
 // que ambos a e b sejam vetores de tamanho size.
 void avaliar(double* a, double* b, int size, double prod_escalar);
 
-struct data {
+typedef struct {
 
     double* a;
     double* b;
@@ -27,11 +27,11 @@ struct data {
     int inicio;
     int fim;
 
-};
+} data;
 
-void* produto_vetorial(void* s) {
+void* produto_escalar(void* s) {
 
-    struct data* vec = (struct data*) s;
+        data* vec = (data*) s;
 
         double* a = vec->a;
         double* b = vec->b;
@@ -39,7 +39,6 @@ void* produto_vetorial(void* s) {
         int inicio = vec->inicio;
         int fim = vec->fim;
 
-        vec->resultado = 0.0;
         printf("INICIO: %d - FIM: %d\n", inicio, fim);
         for (int i = inicio; i < fim; i++) {
             vec->resultado += a[i] * b[i];
@@ -100,8 +99,7 @@ int main(int argc, char* argv[]) {
     }
 
     pthread_t threads[n_threads];
-
-    struct data* s = (struct data *) malloc(n_threads * sizeof(struct data)); 
+    data s[n_threads];
 
     int quantidade = a_size / n_threads;
     int resto = a_size % n_threads;
@@ -110,6 +108,7 @@ int main(int argc, char* argv[]) {
 
         s[i].a = a;
         s[i].b = b;
+        s[i].resultado = 0.0;
         s[i].inicio = i*quantidade;
         s[i].fim = (i+1)*quantidade;
 
@@ -121,7 +120,7 @@ int main(int argc, char* argv[]) {
             s[i].fim = a_size;
         }
 
-        pthread_create(&threads[i], NULL, produto_vetorial, (void *) &s[i]);
+        pthread_create(&threads[i], NULL, produto_escalar, (void *) &s[i]);
     }
 
     for (int i = 0; i < n_threads; ++i) {
@@ -136,7 +135,6 @@ int main(int argc, char* argv[]) {
     avaliar(a, b, a_size, result);
 
     //Libera memória
-    free(s);
     free(a);
     free(b);
 
