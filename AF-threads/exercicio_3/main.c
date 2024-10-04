@@ -39,14 +39,13 @@ void* produto_escalar(void* s) {
         int inicio = vec->inicio;
         int fim = vec->fim;
 
-        printf("INICIO: %d - FIM: %d\n", inicio, fim);
+        //printf("INICIO: %d - FIM: %d\n", inicio, fim);
         for (int i = inicio; i < fim; i++) {
             vec->resultado += a[i] * b[i];
             //printf("%f\n", vec->resultado);
         }
          
         return 0;
-
 }
 
 
@@ -123,7 +122,7 @@ int main(int argc, char* argv[]) {
         pthread_create(&threads[i], NULL, produto_escalar, (void *) &s[i]);
     }
 
-    for (int i = 0; i < n_threads; ++i) {
+    for (int i = 0; i < n_threads; i++) {
         pthread_join(threads[i], NULL);
         result += s[i].resultado;
     }

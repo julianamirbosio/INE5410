@@ -4,7 +4,6 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <pthread.h>
-#include "helper.h"
 
 // Lê o conteúdo do arquivo filename e retorna um vetor E o tamanho dele
 // Se filename for da forma "gen:%d", gera um vetor aleatório com %d elementos
@@ -44,7 +43,6 @@ void* soma_vetores(void* s) {
 
     for (int i = inicio; i < fim; ++i) {
         c[i] = a[i] + b[i];
-        // printf("a = %f, b = %f, c = %f\n", a[i], b[i], c[i]);
     } 
 
     return 0;
@@ -112,7 +110,7 @@ int main(int argc, char* argv[]) {
     }
 
     pthread_t threads[n_threads];
-    struct data s;
+    struct data s[n_threads];
 
     int quantidade = a_size / n_threads;
     int resto = a_size % n_threads;
