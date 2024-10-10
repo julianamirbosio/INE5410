@@ -4,8 +4,7 @@
 #include <assert.h>
 
 //int gValue = 0;
-pthread_mutex_t gMtx;
-pthread_mutex_t gMtx2;
+//pthread_mutex_t gMtx;
 
 // Função imprime resultados na correção do exercício -- definida em helper.c
 void imprimir_resultados(int n, int** results);
@@ -29,28 +28,10 @@ int compute_2(int arg) {
     if (arg < 2) {
         gValue_local += arg;
     } else {
-        gValue_local += compute_2(arg - 1);
-        gValue_local += compute_2(arg - 2);
+        gValue_local += compute_2(arg - 1) + compute_2(arg - 2);
     }
-
     return gValue_local;
 }
-
-/*
-
-ARG = 4
-
-                   compute(3)                         compute (2)
-            compute(2)     compute(1)              compute(1)    compute(0)
-     compute(1)  compute(0)    gvalue = 1           gvalue = 2     gvalue += 0
-     gvalue = 3   gvalue = 0
-
-final = gvalue = 3
-
-
-
-*/
-
 
 // Função wrapper que pode ser usada com pthread_create() para criar uma 
 // thread que retorna o resultado de compute(arg
@@ -79,15 +60,9 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // MUTEX RECURSIVO
-    // pthread_mutexattr_t attr;
-    // pthread_mutexattr_init(&attr);
-    // pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-    // pthread_mutex_init(&gMtx, &attr);
-    // pthread_mutexattr_destroy(&attr);
 
     //Inicializa o mutex
-    pthread_mutex_init(&gMtx, NULL);
+    //pthread_mutex_init(&gMtx, NULL);
 
     int args[n_threads];
     int* results[n_threads];
@@ -102,8 +77,7 @@ int main(int argc, char** argv) {
         pthread_join(threads[i], (void**)&results[i]);
 
     // Não usaremos mais o mutex
-    pthread_mutex_destroy(&gMtx);
-    pthread_mutex_destroy(&gMtx2);
+    //pthread_mutex_destroy(&gMtx);
 
     // Imprime resultados na tela
     // Importante: deve ser chamada para que a correção funcione
