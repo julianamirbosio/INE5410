@@ -7,6 +7,7 @@
 FILE* out;
 
 // semáforos
+<<<<<<< HEAD
 sem_t semA;
 sem_t semB;
 
@@ -19,12 +20,28 @@ void *thread_a(void *args) {
         fflush(stdout);
 
         sem_post(&semB); // Libera o semáforo B
+=======
+sem_t sem_a, sem_b;
+
+void *thread_a(void *args) {
+    for (int i = 0; i < *(int*)args; ++i) {
+        //      +---> arquivo (FILE*) destino
+        //      |    +---> string a ser impressa
+        //      v    v
+        sem_wait(&sem_a); //libera a sessão critica para A escrever
+        fprintf(out, "A");
+        fflush(stdout);
+        // Importante para que vocês vejam o progresso do programa
+        // mesmo que o programa trave em um sem_wait().
+        sem_post(&sem_b);
+>>>>>>> 038f4f12a3a91480f48fb6e2d068e52e349e6e0d
     }
     return NULL;
 }
 
 void *thread_b(void *args) {
     for (int i = 0; i < *(int*)args; ++i) {
+<<<<<<< HEAD
         sem_wait(&semB); // Espera pelo semáforo B
 
         
@@ -32,6 +49,12 @@ void *thread_b(void *args) {
         fflush(stdout);
         
         sem_post(&semA); // Libera o semáforo A
+=======
+        sem_wait(&sem_b); //libera a sessão critica para B escrever
+        fprintf(out, "B");
+        fflush(stdout);
+        sem_post(&sem_a);
+>>>>>>> 038f4f12a3a91480f48fb6e2d068e52e349e6e0d
     }
     return NULL;
 }
@@ -47,9 +70,14 @@ int main(int argc, char** argv) {
 
     pthread_t ta, tb;
 
+<<<<<<< HEAD
     // Inicializa semáforos
     sem_init(&semA, 0, 1); // semA começa disponível
     sem_init(&semB, 0, 1); // semB começa disponível
+=======
+    sem_init(&sem_a, 0, 1);
+    sem_init(&sem_b, 0, 1);
+>>>>>>> 038f4f12a3a91480f48fb6e2d068e52e349e6e0d
 
     // Cria threads
     pthread_create(&ta, NULL, thread_a, &iters);
@@ -59,6 +87,7 @@ int main(int argc, char** argv) {
     pthread_join(ta, NULL);
     pthread_join(tb, NULL);
 
+<<<<<<< HEAD
     // Destrói semáforos
     sem_destroy(&semA);
     sem_destroy(&semB);
@@ -67,5 +96,14 @@ int main(int argc, char** argv) {
     fprintf(out, "\n");
     fclose(out);
 
+=======
+    sem_destroy(&sem_a);
+    sem_destroy(&sem_b);
+
+    //Imprime quebra de linha e fecha arquivo
+    fprintf(out, "\n");
+    fclose(out);
+  
+>>>>>>> 038f4f12a3a91480f48fb6e2d068e52e349e6e0d
     return 0;
 }
