@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 
     // Inicializa semáforos
     sem_init(&semA, 0, 1); // semA começa disponível
-    sem_init(&semB, 0, 1); // semB começa disponível
+    sem_init(&semB, 0, 1); // semB começa indisponível
 
     // Cria threads
     pthread_create(&ta, NULL, thread_a, &iters);
@@ -59,13 +59,13 @@ int main(int argc, char** argv) {
     pthread_join(ta, NULL);
     pthread_join(tb, NULL);
 
-    // Destrói semáforos
-    sem_destroy(&semA);
-    sem_destroy(&semB);
-
     // Imprime quebra de linha e fecha arquivo
     fprintf(out, "\n");
     fclose(out);
+
+    // Destrói semáforos
+    sem_destroy(&semA);
+    sem_destroy(&semB);
 
     return 0;
 }
