@@ -22,16 +22,16 @@ sem_t sem_lista;
 
 void *worker1_func(void *arg) {
     for (int i = 0; i < WORKER_LOOPS; ++i) {
-        sem_post(&sem_lista);
-        printf("Worker 1 obteve sem_lista\n");
-        int operacao = operacao_worker1();
         pthread_mutex_lock(&mutex_total);
         printf("Worker 1 obteve mutex_total\n");
+        sem_wait(&sem_lista);
+        printf("Worker 1 obteve sem_lista\n");
 
+        int operacao = operacao_worker1();
         total_computado += operacao;
         lista_de_operacoes[proximo_indice++] = operacao;
 
-        sem_wait(&sem_lista);
+        sem_post(&sem_lista);
         printf("Worker 1 liberou sem_lista\n");
         pthread_mutex_unlock(&mutex_total);
         printf("Worker 1 liberou mutex_total\n");
@@ -42,7 +42,6 @@ void *worker1_func(void *arg) {
 
 void *worker2_func(void *arg) {
     for (int i = 0; i < WORKER_LOOPS; ++i) {
-        
         pthread_mutex_lock(&mutex_total);
         printf("Worker 2 obteve mutex_total\n");
         sem_wait(&sem_lista);
