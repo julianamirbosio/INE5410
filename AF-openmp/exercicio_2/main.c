@@ -66,7 +66,5 @@ int main (int argc, char *argv[]) {
     free(b);
     free(c);
 
-    printf("tempo: %.3f secs\n", duration);
-
     return 0;
 }
