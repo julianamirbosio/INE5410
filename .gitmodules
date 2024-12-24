@@ -1,0 +1,6 @@
+[submodule "T1-RallyMarciano"]
+	path = T1-RallyMarciano
+	url = https://github.com/lucasfpascoali/INE5410-T1
+[submodule "T2-NASA"]
+	path = T2-NASA
+	url = https://github.com/lucasfpascoali/INE5410-T2
